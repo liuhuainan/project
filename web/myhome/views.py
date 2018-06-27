@@ -1,12 +1,25 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from myadmin.models import Users
+from myadmin.models import Users,Types,Goods
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
 # 首页
 def index(request):
-    return render(request,'myhome/index.html')
+     # 先获取所有的顶级分类
+    data = Types.objects.filter(pid=0)
+    print(data)
+    erdata = []
+    for x in data:
+        # 获取当前类下的子类
+        x.sub = Types.objects.filter(pid=x.id)
+        for v in x.sub:
+            #获取当前子类下的商品 
+            v.goodssub = Goods.objects.filter(typeid=v.id)
+            erdata.append(v)
+
+    context = {'typegoodslist':data,'erdata':erdata}
+    return render(request,'myhome/index.html',context)
 # 列表
 def list(request):
     return render(request,'myhome/list.html')

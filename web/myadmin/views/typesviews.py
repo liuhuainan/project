@@ -56,7 +56,7 @@ def add(request):
         ob = Types()
         ob.name = request.POST['name']
         ob.pid = request.POST['pid']
-        if ob.pid == 0:
+        if ob.pid == '0':
             ob.path = '0,'
         else:
             # 根据当前父级ｉｄ获取ｐａｔｈ在添加当前父级ｉｄ
