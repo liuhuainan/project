@@ -45,11 +45,11 @@
                         <div class="am-form-group tpl-table-list-select">
                             <select name="type" data-am-selected="{btnSize: 'sm'}" style="display: none;">
                               <option value="all" {% if request.GET.type == 'all' %} selected {% endif %} >所有条件</option>
-                              <option value="username" {% if request.GET.type == 'username' %} selected {% endif %} >姓名</option>
-                              <option value="age" {% if request.GET.type == 'age' %} selected {% endif %}>年龄</option>
-                              <option value="email" {% if request.GET.type == 'email' %} selected {% endif %}>邮箱</option>
-                              <option value="phone" {% if request.GET.type == 'phone' %} selected {% endif %}>手机号</option>
-                              <option value="sex" {% if request.GET.type == 'sex' %} selected {% endif %}>性别</option>
+                              <option value="name" {% if request.GET.type == 'name' %} selected {% endif %} >分类名</option>
+                              <!-- <option value="" {% if request.GET.type == '' %} selected {% endif %}>父级</option> -->
+                              <!-- <option value="email" {% if request.GET.type == 'email' %} selected {% endif %}>邮箱</option> -->
+                              <!-- <option value="phone" {% if request.GET.type == 'phone' %} selected {% endif %}>手机号</option> -->
+                              <!-- <option value="sex" {% if request.GET.type == 'sex' %} selected {% endif %}>性别</option> -->
                             </select>
                         </div>
                     </div>
@@ -106,7 +106,9 @@
                                 <li><a href="#">4</a></li>
                                 <li><a href="#">5</a></li> -->
                                 <!-- <li><a href="#"></a></li> -->
-                               
+                                {% load pagetag %}
+
+                                {% Page tlist.paginator.num_pages request %}
                             </ul>
                         </div>
                     </div>

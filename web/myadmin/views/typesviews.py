@@ -15,8 +15,35 @@ def gettypesorder():
         x.name = (num*'|----')+x.name
     return tlist
 def index(request):
-    tlist = gettypesorder()
-    context = {'tlist':tlist}
+     # 获取搜索条件
+    types = request.GET.get('type',None)
+    keywords = request.GET.get('keywords',None)
+    # 判断是否具有搜索条件
+    # print(types,keywords)
+    if types:
+        if types == 'all':
+            # 有搜索条件
+            from django.db.models import Q
+            tlist = Types.objects.filter(
+                Q(name__contains=keywords)
+            )
+        elif types == 'name':
+            # 按照商品名搜索
+            tlist = Types.objects.filter(name__contains=keywords)
+
+    else:
+        tlist = gettypesorder()
+    # context = {'tlist':tlist}
+    from django.core.paginator import Paginator
+    # 实例化分类页　参数１　数据集合　参数２　每页显示条数
+    paginator = Paginator(tlist,10)
+    # 获取当前页码数
+    p = request.GET.get('p',1)
+    # 获取当前页的数据
+    ulist = paginator.page(p)
+    # 分配数据
+    context = {'tlist':ulist}
+    # 加载模板
     return render(request,'myadmin/types/list.html',context)
 def add(request):
     if request.method == 'GET':

@@ -16,7 +16,7 @@ def Page(count,request):
         # 结束页为１０
         end = 10
     # 判断如果当前页 大于 总页数-5
-    elif p > count - 5:
+    if p > count - 5:
         # 则开始页为总页数-9
         start = count - 9
         # 结束页为总页数

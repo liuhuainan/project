@@ -45,11 +45,11 @@
                         <div class="am-form-group tpl-table-list-select">
                             <select name="type" data-am-selected="{btnSize: 'sm'}" style="display: none;">
                               <option value="all" {% if request.GET.type == 'all' %} selected {% endif %} >所有条件</option>
-                              <option value="username" {% if request.GET.type == 'username' %} selected {% endif %} >姓名</option>
-                              <option value="age" {% if request.GET.type == 'age' %} selected {% endif %}>年龄</option>
-                              <option value="email" {% if request.GET.type == 'email' %} selected {% endif %}>邮箱</option>
-                              <option value="phone" {% if request.GET.type == 'phone' %} selected {% endif %}>手机号</option>
-                              <option value="sex" {% if request.GET.type == 'sex' %} selected {% endif %}>性别</option>
+                              <option value="title" {% if request.GET.type == 'title' %} selected {% endif %} >商品名</option>
+                              <option value="price" {% if request.GET.type == 'price' %} selected {% endif %}>价格</option>
+                              <option value="store" {% if request.GET.type == 'store' %} selected {% endif %}>库存</option>
+                              <option value="clicknum" {% if request.GET.type == 'clicknum' %} selected {% endif %}>点击量</option>
+                              <!-- <option value="sex" {% if request.GET.type == 'sex' %} selected {% endif %}>性别</option> -->
                             </select>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                                     <td class="am-text-middle">{{ v.price }}</td>
                                     <td class="am-text-middle">{{ v.store }}</td>
                                     <td class="am-text-middle">{{ v.clicknum }}</td>
-                                    <td class="am-text-middle">{{ v.num }}</td>                                                                                                                                             
+                                    <!-- <td class="am-text-middle">{{ v.num }}</td>                                                                                                                                             -->
                                     <td class="am-text-middle">
                                         {% if v.status == 0 %}
                                             新发布
@@ -128,6 +128,9 @@
                                 <li><a href="#">4</a></li>
                                 <li><a href="#">5</a></li> -->
                                 <!-- <li><a href="#"></a></li> -->
+                                {% load pagetag %}
+
+                                {% Page glist.paginator.num_pages request %}
                             </ul>
                         </div>
                     </div>
