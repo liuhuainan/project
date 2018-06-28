@@ -17,7 +17,7 @@
         <script type="text/javascript" src="/static/myhome/js/jquery.flexslider.js"></script>
         <script type="text/javascript" src="/static/myhome/js/list.js"></script>
 {% endblock %}
-<!-- 内容 -->
+
 {% block con %}
     <div class="listMain">
         <!--分类-->
@@ -108,29 +108,11 @@
                             });
                         });</script>
                     <div class="tb-booth tb-pic tb-s310">
-                        <a href="/static/myhome/images/01.jpg">
-                            <img src="/static/myhome/images/01_mid.jpg" alt="细节展示放大镜特效" rel="/static/myhome/images/01.jpg" class="jqzoom" style="cursor: crosshair;"></a>
+                        <a href="{{ ginfo.pics }}">
+                            <img src="{{ ginfo.pics }}" alt="细节展示放大镜特效" rel="{{ ginfo.pics }}" class="jqzoom" style="cursor: crosshair;">
+                        </a>
                     </div>
-                    <ul class="tb-thumb" id="thumblist">
-                        <li class="tb-selected">
-                            <div class="tb-pic tb-s40">
-                                <a href="#">
-                                    <img src="/static/myhome/images/01_small.jpg" mid="/static/myhome/images/01_mid.jpg" big="/static/myhome/images/01.jpg"></a>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="tb-pic tb-s40">
-                                <a href="#">
-                                    <img src="/static/myhome/images/02_small.jpg" mid="/static/myhome/images/02_mid.jpg" big="/static/myhome/images/02.jpg"></a>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="tb-pic tb-s40">
-                                <a href="#">
-                                    <img src="/static/myhome/images/03_small.jpg" mid="/static/myhome/images/03_mid.jpg" big="/static/myhome/images/03.jpg"></a>
-                            </div>
-                        </li>
-                    </ul>
+                   
                 </div>
                 <div class="clear"></div>
             </div>
@@ -138,7 +120,7 @@
                 <!--规格属性-->
                 <!--名称-->
                 <div class="tb-detail-hd">
-                    <h1>良品铺子 手剥松子218g 坚果炒货 巴西松子</h1></div>
+                    <h1>{{ ginfo.title }}</h1></div>
                 <div class="tb-detail-list">
                     <!--价格-->
                     <div class="tb-detail-price">
@@ -146,7 +128,7 @@
                             <dt>促销价</dt>
                             <dd>
                                 <em>¥</em>
-                                <b class="sys_item_price">56.90</b></dd>
+                                <b class="sys_item_price">{{ ginfo.price }}</b></dd>
                         </li>
                         <li class="price iteminfo_mktprice">
                             <dt>原价</dt>
@@ -273,37 +255,7 @@
                                 <div class="theme-popbod dform">
                                     <form class="theme-signin" name="loginform" action="" method="post">
                                         <div class="theme-signin-left">
-                                            <div class="theme-options">
-                                                <div class="cart-title">口味</div>
-                                                <ul>
-                                                    <li class="sku-line selected">原味
-                                                        <i></i>
-                                                    </li>
-                                                    <li class="sku-line">奶油
-                                                        <i></i>
-                                                    </li>
-                                                    <li class="sku-line">炭烧
-                                                        <i></i>
-                                                    </li>
-                                                    <li class="sku-line">咸香
-                                                        <i></i>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="theme-options">
-                                                <div class="cart-title">包装</div>
-                                                <ul>
-                                                    <li class="sku-line selected">手袋单人份
-                                                        <i></i>
-                                                    </li>
-                                                    <li class="sku-line">礼盒双人份
-                                                        <i></i>
-                                                    </li>
-                                                    <li class="sku-line">全家福礼包
-                                                        <i></i>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                           
                                             <div class="theme-options">
                                                 <div class="cart-title number">数量</div>
                                                 <dd>
@@ -311,21 +263,14 @@
                                                     <input id="text_box" name="" type="text" value="1" style="width:30px;">
                                                     <input id="add" class="am-btn am-btn-default" name="" type="button" value="+">
                                                     <span id="Stock" class="tb-hidden">库存
-                                                        <span class="stock">1000</span>件</span></dd>
+                                                        <span class="stock">{{ ginfo.store }}</span>件</span></dd>
                                             </div>
                                             <div class="clear"></div>
                                             <div class="btn-op">
                                                 <div class="btn am-btn am-btn-warning">确认</div>
                                                 <div class="btn close am-btn am-btn-warning">取消</div></div>
                                         </div>
-                                        <div class="theme-signin-right">
-                                            <div class="img-info">
-                                                <img src="/static/myhome/images/songzi.jpg"></div>
-                                            <div class="text-info">
-                                                <span class="J_Price price-now">¥39.00</span>
-                                                <span id="Stock" class="tb-hidden">库存
-                                                    <span class="stock">1000</span>件</span></div>
-                                        </div>
+                                       
                                     </form>
                                 </div>
                             </div>
@@ -364,11 +309,11 @@
                     </div>
                     <li>
                         <div class="clearfix tb-btn tb-btn-buy theme-login">
-                            <a id="LikBuy" title="点此按钮到下一步确认购买信息" href="#">立即购买</a></div>
+                            <a id="LikBuy" title="点此按钮到下一步确认购买信息" href="javascript:void(0)">立即购买</a></div>
                     </li>
                     <li>
                         <div class="clearfix tb-btn tb-btn-basket theme-login">
-                            <a id="LikBasket" title="加入购物车" href="#">
+                            <a id="LikBasket" title="加入购物车" href="javascript:void(0)">
                                 <i>
                                 </i>加入购物车</a>
                         </div>
@@ -376,51 +321,29 @@
                 </div>
             </div>
             <div class="clear"></div>
+        <script type="text/javascript">
+            // 购物车
+            $('#LikBasket').click(function(){
+                // 获取购买的商品数量,商品id
+                var num = $('#text_box').val()
+                var sid = {{ ginfo.id }}
+
+                
+                // 发生ajax请求,加入购物车
+                $.get('{% url "myhome_addcart" %}',{sid:sid,num:num},function(data){
+                    if(data == '1'){
+                        alert('加入购物车成功')
+                    }else{
+                        alert('加入购物车失败')
+                    }
+                })
+
+
+            })
+
+        </script>
         </div>
-        <!--优惠套装-->
-        <div class="match">
-            <div class="match-title">优惠套装</div>
-            <div class="match-comment">
-                <ul class="like_list">
-                    <li>
-                        <div class="s_picBox">
-                            <a class="s_pic" href="#">
-                                <img src="/static/myhome/images/cp.jpg"></a>
-                        </div>
-                        <a class="txt" target="_blank" href="#">萨拉米 1+1小鸡腿</a>
-                        <div class="info-box">
-                            <span class="info-box-price">¥ 29.90</span>
-                            <span class="info-original-price">￥ 199.00</span></div>
-                    </li>
-                    <li class="plus_icon">
-                        <i>+</i>
-                    </li>
-                    <li>
-                        <div class="s_picBox">
-                            <a class="s_pic" href="#">
-                                <img src="/static/myhome/images/cp2.jpg"></a>
-                        </div>
-                        <a class="txt" target="_blank" href="#">ZEK 原味海苔</a>
-                        <div class="info-box">
-                            <span class="info-box-price">¥ 8.90</span>
-                            <span class="info-original-price">￥ 299.00</span></div>
-                    </li>
-                    <li class="plus_icon">
-                        <i>=</i>
-                    </li>
-                    <li class="total_price">
-                        <p class="combo_price">
-                            <span class="c-title">套餐价:</span>
-                            <span>￥35.00</span></p>
-                        <p class="save_all">共省:
-                            <span>￥463.00</span></p>
-                        <a href="#" class="buy_now">立即购买</a></li>
-                    <li class="plus_icon">
-                        <i class="am-icon-angle-right"></i>
-                    </li>
-                </ul>
-            </div>
-        </div>
+       
         <div class="clear"></div>
         <!-- introduce-->
         <div class="introduce">
@@ -1057,4 +980,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}

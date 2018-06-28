@@ -1,6 +1,6 @@
 {% extends 'myhome/base.html' %}
 {% block title %}
-    <title>列表页</title>
+    <title>搜索页</title>
 {% endblock %}
 
 {% block css %}
@@ -38,13 +38,13 @@
                 <div class="am-u-sm-12 am-u-md-12">
                 <div class="theme-popover">                                                     
                     <div class="searchAbout">
-                        <span class="font-pale">相关搜索：</span>
-                        <a href="#">{{ goodslist.0.typeid.name }}</a>
+                        <span class="font-pale">搜索关键词：</span>
+                        <a href="#">{{ request.GET.keywords }}</a>
 
                     </div>
                     <ul class="select">
                         <p class="title font-normal">
-                            <span class="fl">{{ goodslist.0.typeid.name }}</span>
+                            <span class="fl">{{ request.GET.keywords }}</span>
                             <span class="total fl">搜索到<strong class="num">{{ goodslist.count }}</strong>件相关商品</span>
                         </p>
                         <div class="clear"></div>

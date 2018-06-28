@@ -21,11 +21,33 @@ def index(request):
     context = {'typegoodslist':data,'erdata':erdata}
     return render(request,'myhome/index.html',context)
 # 列表
-def list(request):
-    return render(request,'myhome/list.html')
+def list(request,tid):
+
+    # 根据分类id获取商品信息
+    data = Goods.objects.filter(typeid=tid)
+    print(data)
+    context = {'goodslist':data}
+    return render(request,'myhome/list.html',context)
+# 搜索
+def search(request):
+
+    # 获取搜索参数   
+    keywords = request.GET.get(keywords,None)
+    if not keywords:
+        return HttpResponse('<script>history.back(-1)</script>')
+    # 商品的模糊搜索
+    data = Goods.objects.filter(title__contains=keywords)        
+    context = {'goodslist':data}
+    return render(request,'myhome/search.html',context)
 # 详情
-def info(request):
-    return render(request,'myhome/info.html')
+def info(request, sid):
+    try:
+        # 根据商品id获取商品信息    
+        data = Goods.objects.get(id=sid)
+        context = {'ginfo':data}
+        return render(request,'myhome/info.html',context)
+    except:
+        pass
 # 登录
 def login(request):
     if request.method == 'GET':
@@ -47,7 +69,55 @@ def login(request):
             # 密码或用户名错误
         return HttpResponse('<script>alert("密码或用户名错误");history.back(-1)</script>')
 
+# 购物车
+# 加入购物车
+def addcart(request):
+    # 获取商品id,商品购买数量
+    sid = request.GET['sid']
+    num = int(request.GET['num'])
+    # 先获取购物车的商品数据
+    data = request.session.get('cart',{})
+    # 判断要购物的商品是否已经存在购物车里
+    if sid in data.keys():
+        # 存在,修改数量
+        data[sid]['num'] += num
+    else: 
+        # 不存在,添加    
+        # 定义加入购物车的商品数据格式    
+        ob = Goods.objects.get(id=sid)
+        goods = {'id':ob.id,'title':ob.title,'price':float(ob.price),'pics':ob.pics,'num':num}
+        # print(goods)
+        # 把商品加入购物车    
+        data[sid] = goods
+        # 把购物车存入session
+    request.session['cart'] = data
+    return HttpResponse('1')
+# 购物车列表
+def cartlist(request):
+    data = request.session['cart'].values()
+    return render(request,'myhome/cart.html',{'data':data})
 
+# 删除购物车商品
+def delcart(request):
+    return HttpResponse('删除商品')
+
+# 修改购物车商品数量
+def editcart(request):
+    # 获取商品id,商品购买数量
+    sid = request.GET['sid']
+    num = int(request.GET['num'])
+    # 在ｓｅｓｓｉｏｎ获取购物车数据
+    data = request.session['cart']
+    # 修改
+    data[sid]['num'] = num
+    # 重新写入ｓｅｓｓｉｏｎ
+    request.session['cart'] = data
+    return HttpResponse('0')
+
+# 清空购物车
+def cartclear(request):
+    data = request.session['cart'] = {}    
+    return HttpResponse('<script>location.href="/cartlist/"</script>')
 
 
 

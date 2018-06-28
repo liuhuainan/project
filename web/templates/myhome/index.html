@@ -74,9 +74,9 @@
                                             <div class="sort-side">
                                             {% for vv in v.sub %}
                                                 <dl class="dl-sort">
-                                                    <dt><a href=""><span>{{ vv.name }}</span></a></dt>
+                                                    <dt><a href="{% url 'myhome_list' vv.id %}"><span>{{ vv.name }}</span></a></dt>
                                                     {% for vvv in vv.goodssub %}
-                                                    <dd><a href=""><span>{{ vvv.title }}</span></a></dd>
+                                                    <dd><a href="{% url 'myhome_info' vvv.id %}"><span>{{ vvv.title }}</span></a></dd>
                                                     {% endfor %}
                                                 </dl>
                                             {% endfor %}
@@ -89,9 +89,6 @@
                         <b class="arrow"></b>   
                         </li>
                     {% endfor %}
-
-                  
-              
                     </ul>
                 </div>
             </div>
@@ -112,7 +109,7 @@
                         <div class="shopTitle ">
                             <h4>{{ v.name }}</h4>
                             <span class="more ">
-                            <a href="{% url 'myhome_list' %}">更多美味<i class="am-icon-angle-right" style="padding-left:10px ;" ></i></a>
+                            <a href="{% url 'myhome_list' v.id %}">更多美味<i class="am-icon-angle-right" style="padding-left:10px ;" ></i></a>
                             </span>
                         </div>
                     </div>
@@ -128,7 +125,7 @@
                                     </div>
                                     <i class="am-icon-shopping-basket am-icon-md  seprate"></i>
                                 </div>
-                                <a href="{% url 'myhome_info' %}" ><img style="width: 180px;height: 180px;" src="{{ vv.pics }}" /></a>
+                                <a href="{% url 'myhome_info' vv.id %}" ><img style="width: 180px;height: 180px;" src="{{ vv.pics }}" /></a>
                             </div>
                         {% endfor %}
                     </div>
