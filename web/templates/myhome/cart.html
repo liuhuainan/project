@@ -43,11 +43,17 @@
             <div class="bundle-main">
             {% load pagetag %}
             
+            {% if not data %}
+              <div style="height: 300px;text-align: center;line-height: 300px">
+                   <p> 购物车空空如也...,快去买买买</p>
+              </div>
+            {% endif %}
+
             {% for v in data  %}
                 <ul class="item-content clearfix">
                     <li class="td td-chk">
-                        <div class="cart-checkbox ">
-                            <input class="check" id="J_CheckBox_170037950254" name="items[]" value="170037950254" type="checkbox">
+                        <div class="cart-checkbox jcheck">
+                            <input  class="check" id="{{ v.id }}" name="items[]" value="{% cheng v.price v.num %}" type="checkbox">
                             <label for="J_CheckBox_170037950254"></label>
                         </div>
                     </li>
@@ -92,35 +98,98 @@
                             <a href="javascript:;" sid="{{ v.id }}" data-point-url="#" class="delete">删除</a></div>
                     </li>
                 </ul>
+            
             {% endfor %}
 
             <script type="text/javascript">
+            $(function(){
+
                 // 删除
                 $('.delete').click(function(){
                     sid = $(this).attr('sid')
                     del = $(this)
-                    // alert(sid)
                     $.get('{% url "myhome_delcart" %}',{sid:sid},function(data){
-                           if(data == '0'){
-                                alert('商品删除成功')
-                                del.parents('ul').remove()
-                           }
-                        })
-
+                        if(data == '0'){
+                            alert("购物车商品删除成功")
+                            del.parents('ul').remove()
+                            computer()
+                        }
+                    })
                 })
+
                 // 更新
                 $('.sl .am-btn').click(function(){
                     btn = $(this)
                     setTimeout(function(){
                         sid = btn.parent().attr('sid')
                         num = btn.parent().find('input[name=num]').val()
-                        console.log(sid,num)
                         // 发送ajax请求
                         $.get('{% url "myhome_editcart" %}',{sid:sid,num:num},function(data){
                            location.href = location.href
                         })
                     },20)
                 })
+                
+                // 计算总价,和计算选择的商品信息
+                function computer(){
+                    items = []
+                    totalnum = 0
+                    // 获取所有的check元素
+                     $('.jcheck .check').each(function(){
+                        res = this.checked
+                        if(res){
+                           totalnum += Number($(this).val())
+                           // 把当前选中的商品id和数量定义为{},加入数组中
+                           goodsid = $(this).attr('id')
+                           goodsnum = Number($(this).parents('ul').find('input[name=num]').val())
+                           items.push({'goodsid':goodsid,'num':goodsnum})
+                        }
+                     })
+                     // 把计算的总价设置到html中
+                      $('#J_Total').text(totalnum.toFixed(2))
+                      // 把选择的商品数据,加入到表单中
+                      res = JSON.stringify(items); 
+                      $('input[name=items]').val(res)
+                }
+
+                $('.jcheck .check').click(computer)
+
+
+                $('.check-all').click(function(){
+                    if(this.checked){
+                        // 把所有的都选中
+                        $('.jcheck .check').attr('checked',true)
+
+                    }else{
+                        // 把所有都取消
+                        $('.jcheck .check').attr('checked',false)
+                    }
+                    computer()
+
+                })
+                var user = '{{ request.session.VipUser.username }}'
+                // 让a链接可以进行表单提交
+                $('#J_Go').click(function(){
+                    // 判断表单中的items是否为空
+                    var res = $('input[name=items]').val()
+                    if(res){
+                        // 判断用户是否登录
+                        if(user){
+                         // 执行表单提交
+                         $(this).parents('form').submit()
+                            
+                        }else{
+                            location.href = '{% url "myhome_login" %}?next=/cartlist/'
+                        }
+
+                        
+                    }else{
+                        alert('请选择购买的商品')
+                    }
+                })
+
+             
+            })
             </script>
                 
             </div>
@@ -155,9 +224,16 @@
                     <em id="J_Total">0.00</em></strong>
             </div>
             <div class="btn-area">
-                <a href="pay.html" id="J_Go" class="submit-btn submit-btn-disabled" aria-label="请注意如果没有选择宝贝，将无法结算">
-                    <span>结&nbsp;算</span></a>
+                <form action="{% url 'myhome_ordercheck'%}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="items" value="">
+                    <a href="javascript:void(0)" id="J_Go" class="submit-btn submit-btn-disabled" aria-label="请注意如果没有选择宝贝，将无法结算">
+                        <span>结&nbsp;算</span>
+                    </a>
+                </form>
             </div>
+
+    
         </div>
     </div>
     <div class="footer">

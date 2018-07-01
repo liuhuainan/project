@@ -12,6 +12,8 @@ def pricetwo(val):
 @register.simple_tag
 def cheng(n1,n2):
     res = n1*n2
+    # print(n1,type(n1))
+    # print(n2,type(n2))    
     return round(res,3)
 
 # 自定义页面优化显示标签

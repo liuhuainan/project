@@ -29,7 +29,7 @@
                     <h3 class="title">登录商城</h3>
                     <div class="clear"></div>
                     <div class="login-form">
-                        <form method="post">
+                        <form method="post" action="?next{{ request.GET.next|default:'/' }}">
                             {% csrf_token %}
                             <div class="user-name">
                                 <label for="user">

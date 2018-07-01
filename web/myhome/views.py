@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from myadmin.models import Users,Types,Goods
+from myadmin.models import Users,Types,Goods,Address,Orders,OrderInfo
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
@@ -50,6 +50,8 @@ def info(request, sid):
         pass
 # 登录
 def login(request):
+    nexturl = request.GET.get('next','/')
+
     if request.method == 'GET':
         return render(request,'myhome/login.html')
     elif request.method == 'POST':
@@ -58,12 +60,13 @@ def login(request):
         # 进行登录
         # 根据用户名检测用户对象是否正确，再根据密码判断是否正确
         try:
-            ob = Users.objects.get(username == request.POST['username'])
+            ob = Users.objects.get(username = request.POST['username'])
             res = check_password(request.POST['password'],ob.password)
+            print(ob,res)
             if res:
                 # 密码正确
                 request.session['VipUser'] = {'uid':ob.id,'username':ob.username}
-                return HttpResponse('<script>alert("登录成功");location.href="/"</script>')
+                return HttpResponse('<script>alert("登录成功");location.href="'+nexturl+'"</script>')
         except:
             pass
             # 密码或用户名错误
@@ -99,7 +102,14 @@ def cartlist(request):
 
 # 删除购物车商品
 def delcart(request):
-    return HttpResponse('删除商品')
+    sid = request.GET['sid']
+    # 获取sessin中的购物车数据
+    data = request.session['cart']
+    del data[sid]
+    # 把购物车重新写入session
+    request.session['cart'] = data 
+    return HttpResponse('0')
+    # return HttpResponse('删除商品')
 
 # 修改购物车商品数量
 def editcart(request):
@@ -119,8 +129,113 @@ def cartclear(request):
     data = request.session['cart'] = {}    
     return HttpResponse('<script>location.href="/cartlist/"</script>')
 
+# 订单确认
+def ordercheck(request):
+    # 获取购物车提交的数据
+    items = eval(request.POST['items'])
+    data = {}
+    totalprice = 0
+    totalnum = 0
+    for x in items:
+        ob = Goods.objects.get(id=x['goodsid'])
+        # price(ob)
+        x['title'] = ob.title
+        x['price'] = float(ob.price)
+        x['pics'] = ob.pics
+        # 计算总价和总数
+        totalprice += x['num']*x['price']
+        totalnum += x['num']
+    data['totalprice'] = round(totalprice,2)
+    data['totalnum'] = totalnum
+    data['items'] = items
+    # print(data)
+    # 把确认的商品信息存入　ｓｅｓｓｉｏｎ
+    request.session['order'] = data    
+    # 获取当前用户的收货地址
+    addlist = Address.objects.filter(uid=request.session['VipUser']['uid'])
+    context = {'data':data,'addlist':addlist}
+    return render(request,'myhome/ordercheck.html',context)
+    # return HttpResponse('确认订单')
+
+# 地址修改
+def addressedit(request):
+    aid = int(request.GET['aid'])
+    uid = request.session['VipUser']['uid']
+    # 获取当前用户的所有收货地址
+    obs = Address.objects.filter(uid=uid)
+    for x in obs:
+        if x.id == aid:
+            x.status = 1
+        else:
+            x.status = 0
+        x.save()
+    return HttpResponse(0)
 
 
+# 地址添加
+def addressadd(request):
+    data = eval(request.GET['data'])
+    data['address'] = ",".join(data['address'])
+    data['uid'] = Users.objects.get(id=request.session['VipUser']['uid'])
+    #添加地址信息
+    res = Address.objects.create(**data)
+    return HttpResponse(0)
+
+
+
+# 生成订单
+def ordercreate(request):
+    # 接受用户ｉｄ
+    uid = request.session['VipUser']['uid']
+    # 接受地址ｉｄ
+    addressid = request.POST['addressid']
+    # 商品信息
+    data = request.session['order']
+    # 获取购物车中的数据
+    cart = request.session['cart']
+    # 生成订单
+    ob = Orders()
+    ob.uid = Users.objects.get(id=uid)
+    ob.addressid = Address.objects.get(id=addressid)
+    ob.totalprice = data['totalprice']    
+    ob.totalnum = data['totalnum']
+    ob.save()
+    # 订单详情
+    for v in data['items']:
+        oinfo = OrderInfo()
+        oinfo.orderid = ob
+        oinfo.gid = Goods.objects.get(id=v['goodsid'])
+        oinfo.num = v['num']
+        oinfo.save()
+        # 在购物车中删除当前购买的商品
+        del cart[v['goodsid']]
+    # 清楚购物车中已经下单的商品，清楚ｏｒｄｅｒ数据
+    request.session['cart'] = cart
+    request.session['order'] = ''
+    # 把生成订单id get请求到一个新的付款页面
+    return HttpResponse('<script>location.href="/buy/?orderid='+str(ob.id)+'"</script>')
+# 支付
+def buy(request):
+    # 获取当前的订单id
+    orderid = request.GET['orderid']
+    # print(orderid)
+    return render(request,'myhome/buy.html')
+# 支付成功
+def buysuccess(request):
+    
+    return render(request,'myhome/buy.html')
+
+# 我的个人中心
+def mycenter(request):
+    
+    return render(request,'myhome/personcenter/index.html')
+
+# 我的订单
+def myorders(request):
+    # 获取当前用户的所有订单
+    data = Orders.objects.filter(uid=request.session['VipUser']['uid'])
+    context = {'orderlist':data}
+    return render(request,'myhome/personcenter/myorders.html',context)
 # 注册
 def register(request):
     if request.method == 'GET':
