@@ -1,6 +1,8 @@
 from django.shortcuts import render,reverse
 from django.http import HttpResponse,JsonResponse
 from .. models import Types
+from django.contrib.auth.decorators import permission_required
+
 # Create your views here.
 def gettypesorder():
     # 获取所有分类信息
@@ -14,6 +16,9 @@ def gettypesorder():
         num  = x.path.count(',')-1
         x.name = (num*'|----')+x.name
     return tlist
+
+# 商品分类列表
+@permission_required('myadmin.show_types',raise_exception = True)
 def index(request):
      # 获取搜索条件
     types = request.GET.get('type',None)
@@ -30,7 +35,6 @@ def index(request):
         elif types == 'name':
             # 按照商品名搜索
             tlist = Types.objects.filter(name__contains=keywords)
-
     else:
         tlist = gettypesorder()
     # context = {'tlist':tlist}
@@ -45,6 +49,9 @@ def index(request):
     context = {'tlist':ulist}
     # 加载模板
     return render(request,'myadmin/types/list.html',context)
+
+# 商品分类添加
+@permission_required('myadmin.insert_types',raise_exception = True)
 def add(request):
     if request.method == 'GET':
         tlist = gettypesorder()
@@ -65,6 +72,8 @@ def add(request):
         ob.save()
         return HttpResponse('<script>alert("添加成功");location.href="'+reverse('myadmin_types_list')+'"</script>')
 
+# 商品分类删除
+@permission_required('myadmin.del_types',raise_exception = True)
 def delete(request):
     tid = request.GET.get('uid',None)
     # 判断当前类下是否有子类
@@ -77,6 +86,9 @@ def delete(request):
         ob.delete()
         data = {'msg':'删除成功','code':0}
     return JsonResponse(data)
+
+# 修改
+@permission_required('myadmin.edit_types',raise_exception = True)
 def edit(request):
     tid = request.GET.get('uid',None)
     # 获取对象数据

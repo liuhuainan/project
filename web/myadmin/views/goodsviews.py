@@ -4,7 +4,11 @@ from . typesviews import gettypesorder
 from . userviews import uploads
 from .. models import Goods,Types
 import os
+from django.contrib.auth.decorators import permission_required
+
 # Create your views here.
+# 商品列表
+@permission_required('myadmin.show_goods',raise_exception = True)
 def index(request):
     # 获取搜索条件
     types = request.GET.get('type',None)
@@ -49,6 +53,8 @@ def index(request):
     context = {'glist':ulist}
     # 加载模板
     return render(request,'myadmin/goods/list.html',context)
+# 商品添加
+@permission_required('myadmin.insert_goods',raise_exception = True)
 def add(request):
     if request.method == 'GET':
         tlist = gettypesorder()
@@ -73,7 +79,7 @@ def add(request):
         # 执行商品创建
         ob = Goods.objects.create(**data)
         return HttpResponse('<script>alert("添加成功");location.href="'+reverse('myadmin_goods_list')+'"</script>')
-
+@permission_required('myadmin.del_goods',raise_exception = True)
 def delete(request):
     try:
         uid = request.GET.get('uid',None)
@@ -88,9 +94,10 @@ def delete(request):
     except:
         data = {'msg':'删除失败','code':1}
     return JsonResponse(data)
+@permission_required('myadmin.edit_goods',raise_exception = True)
 def edit(request):
     # 接收参数
-    uid = request.GET.get('uid',None)    
+    uid = request.GET.get('uid',None)   
     # 获取对象
     ob = Goods.objects.get(id=uid)
     # print(ob)

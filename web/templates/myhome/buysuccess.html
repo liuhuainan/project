@@ -15,22 +15,31 @@
 {% block con %}
 <div class="take-delivery">
     <div class="status">
-      <h2>请付款</h2>
-      <div class="successInfo">
-        <ul>
-            <input type="hidden" value="{{ order.id }}">
+        <h2>您已成功付款</h2>
+        <div class="successInfo">
+            <ul>
             <li>付款金额<em>¥{{ order.totalprice }}</em></li>
             <div class="user-info">
                 <p>收货人：{{ order.addressid.name }}</p>
                 <p>联系电话：{{order.addressid.phone}}</p>
                 <p>收货地址：{{ order.addressid.address }},{{order.addressid.xiangxi}}</p>
             </div>
-                请认真核对您的收货信息，如有错误请联系客服                     
-        </ul>
-        <div class="option">
-            <a href="{% url 'myhome_buysuccess' %}?orderid={{ order.id }}">支付</a>
-        </div>
-        </script>
+                    请认真核对您的收货信息，如有错误请联系客服                     
+            </ul>
+            <div class="option">
+            <span class="info">您可以</span>
+            <a href="＃" class="J_MakePoint">查看<span>已买到的宝贝</span></a>
+            <a href="＃" class="J_MakePoint">查看<span>交易详情</span></a>
+            <p>倒计时<span id="totalSecond">5</span>s之后跳转个人中心</p>                                 
+            </div>
+            <script language="javascript" type="text/javascript"> 
+                var second = totalSecond.innerText; 
+                setInterval("redirect()", 1000); 
+                function redirect(){ 
+                totalSecond.innerText=--second; 
+                if(second<1) location.href='{% url "myhome_mycenter" %}'; 
+                } 
+            </script>
        </div>
      </div>
    </div>

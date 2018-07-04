@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+import os
 from myadmin.models import Users,Types,Goods,Address,Orders,OrderInfo
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -8,7 +9,7 @@ from django.contrib.auth.hashers import make_password, check_password
 def index(request):
      # 先获取所有的顶级分类
     data = Types.objects.filter(pid=0)
-    print(data)
+    # print(data)
     erdata = []
     for x in data:
         # 获取当前类下的子类
@@ -62,7 +63,7 @@ def login(request):
         try:
             ob = Users.objects.get(username = request.POST['username'])
             res = check_password(request.POST['password'],ob.password)
-            print(ob,res)
+            # print(ob,res)
             if res:
                 # 密码正确
                 request.session['VipUser'] = {'uid':ob.id,'username':ob.username}
@@ -181,8 +182,6 @@ def addressadd(request):
     res = Address.objects.create(**data)
     return HttpResponse(0)
 
-
-
 # 生成订单
 def ordercreate(request):
     # 接受用户ｉｄ
@@ -212,24 +211,68 @@ def ordercreate(request):
     # 清楚购物车中已经下单的商品，清楚ｏｒｄｅｒ数据
     request.session['cart'] = cart
     request.session['order'] = ''
-    # 把生成订单id get请求到一个新的付款页面
+    # 把生成订单id 请求到一个新的付款页面
     return HttpResponse('<script>location.href="/buy/?orderid='+str(ob.id)+'"</script>')
+
 # 支付
 def buy(request):
     # 获取当前的订单id
     orderid = request.GET['orderid']
     # print(orderid)
-    return render(request,'myhome/buy.html')
+    ob = Orders.objects.get(id=orderid)
+    # print(ob)
+    context = {'order':ob}
+    return render(request,'myhome/buy.html',context)
+
 # 支付成功
 def buysuccess(request):
-    
-    return render(request,'myhome/buy.html')
-
+    # 获取当前的订单id
+    orderid = request.GET['orderid']
+    ob = Orders.objects.get(id=orderid)
+    context = {'order':ob}
+    ob.status = 1
+    ob.save()
+    return render(request,'myhome/buysuccess.html',context)
 # 我的个人中心
 def mycenter(request):
-    
+
     return render(request,'myhome/personcenter/index.html')
 
+# 个人信息
+def personinfo(request):
+    if request.method == 'GET':
+        # 接受用户id         
+        uid = request.session['VipUser']['uid']
+        # print(uid)
+        # 获取用户信息
+        ob = Users.objects.get(id=uid)
+        # print(ob)
+        context = {'user':ob}
+        return render(request,'myhome/personcenter/information.html',context)
+    elif request.method == 'POST':
+        # 获取用户id
+        uid = request.session['VipUser']['uid']
+        ob = Users.objects.get(id=uid)
+        try:
+            # 判断是否上传了新的图片
+            if request.FILES.get('pic',None):
+                # # 判断是否使用的默认图
+                if ob.pic:
+                    # 如果使用的不是默认图,则删除之前上传的头像
+                    os.remove('.'+ob.pic)
+                # 执行上传
+                ob.pic = uploads(request)
+            ob.username = request.POST['username']
+            ob.sex = request.POST['sex']
+            ob.phone = request.POST['phone']
+            ob.age = request.POST['age']
+            ob.nickname = request.POST['nickname']
+            ob.save()
+            request.session['VipUser'] = {'uid':ob.id,'username':ob.username}
+    
+            return HttpResponse('<script>alert("修改成功");history.back(-1)</script>')      
+        except:
+            return HttpResponse('<script>alert("修改失败");history.back(-1)</script>')      
 # 我的订单
 def myorders(request):
     # 获取当前用户的所有订单
@@ -310,3 +353,30 @@ def vcode(request):
     im.save(buf, 'png')
     #将内存中的图片数据返回给客户端，MIME类型为图片png
     return HttpResponse(buf.getvalue(), 'image/png')
+
+# 执行文件的上传
+def uploads(request):
+    
+    # 获取请求中的 文件 File 
+    myfile = request.FILES.get('pic',None)
+
+    # 获取上传的文件后缀名 myfile.name.split('.').pop()
+    p = myfile.name.split('.').pop()
+    arr = ['jpg','png','jpeg','gif']
+    if p not in arr:
+        return 1
+
+    import time,random
+    # 生成新的文件名
+    filename = str(time.time())+str(random.randint(1,99999))+'.'+p
+    
+    # 打开文件
+    destination = open("./static/pics/"+filename,"wb+")
+
+    # 分块写入文件  
+    for chunk in myfile.chunks():      
+       destination.write(chunk)  
+
+    # 关闭文件
+    destination.close()
+    return '/static/pics/'+filename  

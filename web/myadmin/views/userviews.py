@@ -2,7 +2,11 @@ from django.shortcuts import render,reverse
 from django.http import HttpResponse,JsonResponse
 from .. models import Users
 import os
+from django.contrib.auth.decorators import permission_required
+
 # Create your views here.
+@permission_required('myadmin.show_users',raise_exception = True)
+# 会员列表
 def index(request):
     # 获取搜索条件
     types = request.GET.get('type',None)
@@ -50,7 +54,8 @@ def index(request):
     context = {'userlist':ulist}
     # 加载模板
     return render(request,'myadmin/user/list.html',context)
-    
+
+@permission_required('myadmin.insert_users',raise_exception = True) 
 # 会员添加
 def add(request):
     if request.method == 'GET':
@@ -83,6 +88,8 @@ def add(request):
             return HttpResponse('<script>alert("添加成功");location.href="'+reverse('myadmin_user_list')+'"</script>')            
         except:
             return HttpResponse('<script>alert("添加失败");location.href="'+reverse('myadmin_user_add')+'"</script>')
+
+@permission_required('myadmin.del_users',raise_exception = True)
 # 会员删除
 def delete(request):
     try:
@@ -99,6 +106,9 @@ def delete(request):
         data = {'msg':'删除失败','code':1}
     return JsonResponse(data)
     # return HttpResponse('delete')
+
+
+@permission_required('myadmin.edit_users',raise_exception = True)
 # 显示编辑和执行编辑
 def edit(request):
     # 接收参数
@@ -118,7 +128,6 @@ def edit(request):
                 if ob.pic:
                     # 如果使用的不是默认图,则删除之前上传的头像
                     os.remove('.'+ob.pic)
-
                 # 执行上传
                 ob.pic = uploads(request)
 
@@ -127,6 +136,7 @@ def edit(request):
             ob.age = request.POST['age']
             ob.sex = request.POST['sex']
             ob.phone = request.POST['phone']
+            # ob.pic = request.POST['pic']            
             ob.save()
 
             return HttpResponse('<script>alert("更新成功");location.href="'+reverse('myadmin_user_list')+'"</script>')
@@ -155,8 +165,6 @@ def uploads(request):
     # 分块写入文件  
     for chunk in myfile.chunks():      
        destination.write(chunk)  
-
-    # # destination.write(myfile.read()) #不推荐
 
     # 关闭文件
     destination.close()

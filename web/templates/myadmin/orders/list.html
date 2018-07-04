@@ -1,7 +1,7 @@
 {% extends 'myadmin/public/base.html' %}
 
 {% block title %}
-<title>后台会员列表</title>
+<title>后台商品订单</title>
 {% endblock %}
 
 {% block header %}
@@ -9,7 +9,7 @@
         <div class="am-u-sm-12 am-u-md-12 am-u-lg-9">
             <div class="page-header-heading">
                 <span class="am-icon-home page-header-heading-icon"></span> 
-                会员列表 <small>Amaze UI</small>
+                订单列表 <small>Amaze UI</small>
             </div>
         </div>
     </div>
@@ -22,7 +22,7 @@
         <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
             <div class="widget am-cf">
                 <div class="widget-head am-cf">
-                    <div class="widget-title  am-cf">会员列表</div>
+                    <div class="widget-title  am-cf">订单列表</div>
 
 
                 </div>
@@ -32,7 +32,7 @@
                         <div class="am-form-group">
                             <div class="am-btn-toolbar">
                                 <div class="am-btn-group am-btn-group-xs">
-                                    <a  href="{% url 'myadmin_user_add' %}" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</a>
+                                    <button type="button" class="am-btn am-btn-default am-btn-success"><span class="am-icon-plus"></span> 新增</button>
                                     <button type="button" class="am-btn am-btn-default am-btn-secondary"><span class="am-icon-save"></span> 保存</button>
                                     <button type="button" class="am-btn am-btn-default am-btn-warning"><span class="am-icon-archive"></span> 审核</button>
                                     <button type="button" class="am-btn am-btn-default am-btn-danger"><span class="am-icon-trash-o"></span> 删除</button>
@@ -45,17 +45,17 @@
                         <div class="am-form-group tpl-table-list-select">
                             <select name="type" data-am-selected="{btnSize: 'sm'}" style="display: none;">
                               <option value="all" {% if request.GET.type == 'all' %} selected {% endif %} >所有条件</option>
-                              <option value="username" {% if request.GET.type == 'username' %} selected {% endif %} >姓名</option>
-                              <option value="age" {% if request.GET.type == 'age' %} selected {% endif %}>年龄</option>
-                              <option value="email" {% if request.GET.type == 'email' %} selected {% endif %}>邮箱</option>
-                              <option value="phone" {% if request.GET.type == 'phone' %} selected {% endif %}>手机号</option>
-                              <option value="sex" {% if request.GET.type == 'sex' %} selected {% endif %}>性别</option>
+                              <option value="id" {% if request.GET.type == 'id' %} selected {% endif %} >ID</option>
+                              <option value="totalprice" {% if request.GET.type == 'totalprice' %} selected {% endif %}>价格</option>
+                              <option value="totalnum" {% if request.GET.type == 'totalnum' %} selected {% endif %}>数量</option>
+                              <option value="status" {% if request.GET.type == 'status' %} selected {% endif %}>状态</option>                              
+                              
                             </select>
                         </div>
                     </div>
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-3">
                         <div class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
-                            <input name="keywords" type="text" class="am-form-field " value="{{ request.GET.keywords }}">
+                            <input  placeholder="状态请输入0,1,2,3" name="keywords" type="text" class="am-form-field " value="{{ request.GET.keywords }}">
                             <span class="am-input-group-btn">
                             <button class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-search"></button>
                           </span>
@@ -66,50 +66,62 @@
                         <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black ">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>头像缩略图</th>
-                                    <th>用户名</th>
-                                    <th>邮箱</th>
-                                    <th>手机号</th>
-                                    <th>性别</th>
-                                    <th>年龄</th>                                    
+                                    <th>订单ID</th>
+                                    <th>商品缩略图</th>
+                                    <th>商品名</th>
+                                    <th>收货人</th>
+                                    <th>价格</th>
+                                    <th>数量</th>
+                                    <th>地址</th>                                    
                                     <th>状态</th>
-                                    <th>注册时间</th>
+                                    <th>添加时间</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for v in userlist %}
+                            {% for v in orderlist %}
                                 <tr>
+                                {% for x in v.orderinfo_set.all %}
+                                    
                                     <td class="am-text-middle">{{ v.id }}</td>
                                     <td>
-                                        <img src="{{ v.pic|default:'/static/pics/user.jpg' }}" class="tpl-table-line-img" alt="">
+                                        <img src="{{ x.gid.pics }}" class="tpl-table-line-img" alt="" width="100">
                                     </td>
-                                    <td class="am-text-middle">{{ v.username }}</td>
-                                    <td class="am-text-middle">{{ v.email }}</td>
-                                    <td class="am-text-middle">{{ v.phone }}</td>
-                                    <td class="am-text-middle">{{ v.sex }}</td>
-                                    <td class="am-text-middle">{{ v.age }}</td>                                                                                                          
+                                    <td class="am-text-middle">{{ x.gid.title }}</td>
+                                    <td class="am-text-middle">{{ v.addressid.name }}</td>
+                                    <td class="am-text-middle">{{ v.totalprice }}</td>
+                                    <td class="am-text-middle">{{ v.totalnum }}</td>
+                                    <td class="am-text-middle">{{ v.addressid.address }},{{ v.addressid.xiangxi }},</td>
+                                    <!-- <td class="am-text-middle">{{ v.num }}</td>                                                                                                                                             -->
                                     <td class="am-text-middle">
                                         {% if v.status == 0 %}
-                                            会员
-                                        {% else %}
-                                            禁用
+                                            未付款
+                                        {% elif v.status == 1 %}
+                                            待发货
+                                        {% elif v.status == 2 %}
+                                            待收货
+                                        {% elif v.status == 3 %}
+                                            待评价
+                                        {% elif v.status == 4 %}
+                                            交易完成
                                         {% endif %}
 
                                     </td>
                                     <td class="am-text-middle">{{ v.addtime|date:"Y-m-d H:i:s" }}</td>
                                     <td class="am-text-middle">
                                         <div class="tpl-table-black-operation">
-                                            <a href="{% url 'myadmin_user_edit' %}?uid={{ v.id }}">
-                                                <i class="am-icon-pencil"></i> 编辑
+                                            <a href="{% url 'myadmin_orders_edit' %}?uid={{ v.id }}">
+                                                <i class="am-icon-pencil"></i> 修改状态
                                             </a>
-                                            <a href="javascript:;" class="tpl-table-black-operation-del">
+                                            
+                                            <!-- <a href="javascript:;" class="tpl-table-black-operation-del">
                                                 <i class="am-icon-trash"></i> 删除
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </td>
+                                {% endfor %}
                                 </tr>
+                       
                             {% endfor %}
                         
                                 <!-- more data -->
@@ -129,7 +141,7 @@
                                 <!-- <li><a href="#"></a></li> -->
                                 {% load pagetag %}
 
-                                {% Page userlist.paginator.num_pages request %}
+                                {% Page orderlist.paginator.num_pages request %}
                             </ul>
                         </div>
                     </div>
@@ -143,7 +155,7 @@
         id = $(this).parents('tr').find('td:eq(0)').text()
         // alert(id)     
         a = $(this)
-        $.get("{% url 'myadmin_user_delete' %}",{uid:id},function(data){
+        $.get("{% url 'myadmin_goods_delete' %}",{uid:id},function(data){
             alert(data.msg)
             if(data.code == 0){
                 // 移除当前的一天数据
